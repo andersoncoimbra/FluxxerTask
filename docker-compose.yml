@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Serviço para a aplicação Laravel
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/var/www/html
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=fluxxer_test
+      - DB_USERNAME=fluxxer_user
+      - DB_PASSWORD=fluxxer_password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    command: composer run start
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app-network
+  
+   # Serviço para o front-end em Vue
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    image: vue-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./front:/app
+    networks:
+      - app-network
+    depends_on:
+      - api
+
+  # Serviço para o banco de dados PostgreSQL
+  db:
+    image: postgres:13
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=fluxxer_test
+      - POSTGRES_USER=fluxxer_user
+      - POSTGRES_PASSWORD=fluxxer_password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Serviço para o Redis
+  redis:
+    image: redis:6-alpine
+    restart: unless-stopped
+    networks:
+      - app-network
+
+# Volumes para persistência de dados
+volumes:
+  db-data:
+    driver: local
+
+# Rede para os serviços se comunicarem
+networks:
+  app-network:
+    driver: bridge

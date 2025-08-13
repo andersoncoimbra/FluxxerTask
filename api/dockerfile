@@ -1,0 +1,28 @@
+# Use a imagem oficial do PHP
+FROM php:8.2-fpm
+
+# Instale as dependências do sistema
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpq-dev \
+    libzip-dev \
+    unzip \
+    libonig-dev \
+    npm \
+    nodejs
+
+# Limpe os caches
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Instale as extensões do PHP
+RUN docker-php-ext-install pdo pdo_pgsql zip
+
+# Instale o Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Defina o diretório de trabalho
+WORKDIR /var/www/html
+
+# Exponha a porta 8000
+EXPOSE 8000
