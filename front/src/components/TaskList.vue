@@ -1,15 +1,20 @@
 <template>
-  <div>
+  <div class="container mt-5">
     <h2>Gerenciador de Tarefas</h2>
 
-    <form @submit.prevent="createTask">
-      <input v-model="newTaskTitle" type="text" placeholder="Nome da nova tarefa" required />
-      <button type="submit">Adicionar Tarefa</button>
+    <form @submit.prevent="createTask" class="mb-3">
+      <div class="input-group">
+        <input v-model="newTaskTitle" type="text" class="form-control" placeholder="Nome da nova tarefa" required />
+        <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+      </div>
     </form>
 
-    <ul>
-      <li v-for="task in tasks" :key="task.id">
-        <strong>{{ task.title }}</strong> - Status: {{ task.status }}
+    <ul class="list-group">
+      <li v-for="task in tasks" :key="task.id" class="list-group-item d-flex justify-content-between align-items-center">
+        <strong>{{ task.title }}</strong>
+        <span :class="{'badge bg-primary': task.status === 'pending', 'badge bg-warning': task.status === 'processing', 'badge bg-success': task.status === 'done'}">
+          {{ task.status }}
+        </span>
       </li>
     </ul>
   </div>
@@ -24,11 +29,10 @@ export default {
     return {
       tasks: [],
       newTaskTitle: '',
-      apiUrl: 'http://localhost:8000/api/tasks' // URL da API do Laravel
+      apiUrl: 'http://localhost:8000/api/tasks'
     };
   },
   mounted() {
-    // Quando o componente é montado, busca a lista de tarefas
     this.fetchTasks();
   },
   methods: {
@@ -44,9 +48,7 @@ export default {
     createTask() {
       axios.post(this.apiUrl, { title: this.newTaskTitle })
         .then(response => {
-          // Limpa o input do formulário
           this.newTaskTitle = '';
-          // Atualiza a lista de tarefas sem recarregar a página
           this.fetchTasks();
           console.log("Tarefa criada com sucesso:", response.data);
         })
@@ -59,16 +61,8 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos básicos para o componente */
-form {
-  margin-bottom: 20px;
-}
-ul {
-  list-style: none;
-  padding: 0;
-}
-li {
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
+/* Você ainda pode adicionar estilos específicos do componente aqui */
+.badge {
+  font-size: 0.8rem;
 }
 </style>
