@@ -28,6 +28,31 @@ services:
     networks:
       - app-network
   
+  # worker para processar filas do Laravel
+  worker:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./api:/var/www/html
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=fluxxer_test
+      - DB_USERNAME=fluxxer_user
+      - DB_PASSWORD=fluxxer_password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    command: php artisan horizon
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app-network
+  
    # Serviço para o front-end em Vue
   frontend:
     build:

@@ -27,5 +27,3 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Defina o diretório de trabalho
 WORKDIR /var/www/html
 
-# Exponha a porta 8000
-EXPOSE 8000

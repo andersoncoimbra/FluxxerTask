@@ -29,11 +29,22 @@ export default {
     return {
       tasks: [],
       newTaskTitle: '',
-      apiUrl: 'http://localhost:8000/api/tasks'
+      apiUrl: 'http://localhost:8000/api/tasks',
+      intervalId: null
     };
   },
   mounted() {
     this.fetchTasks();
+    // Atualizar a lista a cada 30 segundos
+    this.intervalId = setInterval(() => {
+      this.fetchTasks();
+    }, 30000);
+  },
+  beforeUnmount() {
+    // Limpar o intervalo quando o componente for desmontado
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   },
   methods: {
     fetchTasks() {
