@@ -9,20 +9,20 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instala as dependências
-#RUN npm install
+RUN npm install
 
 # Copia o restante do código da aplicação
 COPY . .
 
 # Compila a aplicação para produção
-#RUN npm run build
+RUN npm run build
 
 # Estágio de produção
 # Usa uma imagem do Nginx para servir a aplicação estática
 FROM nginx:stable-alpine as production-stage
 
 # Copia os arquivos estáticos compilados do estágio de build para o Nginx
-#COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY --from=build-stage /app/dist /usr/share/nginx/html
 
 # Copia o arquivo de configuração do Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
